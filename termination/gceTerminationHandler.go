@@ -154,17 +154,25 @@ func (g *gceTerminationSource) WatchState() <-chan NodeTerminationState {
 		return nil
 	}
 	go wait.Forever(func() {
-		err := metadata.Subscribe(maintenanceEventSuffix, g.handleMaintenanceEvents)
+		state, err := metadata.Get(maintenanceEventSuffix)
 		if err != nil {
 			glog.Errorf("Failed to get maintenance status for node %q - %v", g.state.NodeName, err)
 			return
 		}
+		if state == maintenanceEventTrue {
+			glog.Infof("Start handling Termination, %s is %s, node: %q", maintenanceEventSuffix, state, g.state.NodeName)
+			g.handleMaintenanceEvents(state, true)
+		}
 	}, time.Second)
 	go wait.Forever(func() {
-		err := metadata.Subscribe(preemptedEventSuffix, g.handleMaintenanceEvents)
+		state, err := metadata.Get(preemptedEventSuffix)
 		if err != nil {
 			glog.Errorf("Failed to get preemptible maintenance status for node %q - %v", g.state.NodeName, err)
 			return
+		}
+		if state == maintenanceEventTrue {
+			glog.Infof("Start handling Termination, %s is %s, node: %q", preemptedEventSuffix, state, g.state.NodeName)
+			g.handleMaintenanceEvents(state, true)
 		}
 	}, time.Second)
 	return g.updateChannel
