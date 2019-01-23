@@ -22,7 +22,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/GoogleCloudPlatform/k8s-node-termination-handler/termination"
+	"github.com/axot/k8s-node-termination-handler/termination"
 	"github.com/golang/glog"
 
 	"k8s.io/api/core/v1"
