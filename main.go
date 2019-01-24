@@ -42,7 +42,7 @@ var (
 	excludePodsVar      = flag.String("exclude-pods", "", "List of pods to exclude from graceful eviction. Expected format is comma separated 'podName:podNamespace'.")
 	kubeconfig          *string
 	// TODO: Update this to use NoExecute taints once that graduates out of alpha.
-	taintVar                = flag.String("taint", "", "Taint to place on the node while handling terminations. Example: cloud.google.com/impending-node-termination::NoSchedule")
+	taintVar                = flag.String("taint", "cloud.google.com/impending-node-termination::NoSchedule", "Taint to place on the node while handling terminations. Example: cloud.google.com/impending-node-termination::NoSchedule")
 	annotationVar           = flag.String("annotation", "", "Annotation to set on Node objects while handling terminations")
 	systemPodGracePeriodVar = flag.Duration("system-pod-grace-period", 30*time.Second, "Time required for system pods to exit gracefully.")
 )

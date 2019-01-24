@@ -150,6 +150,7 @@ func (g *gceTerminationSource) handleMaintenanceEvents(state string, exists bool
 }
 
 func (g *gceTerminationSource) WatchState() <-chan NodeTerminationState {
+	preMaintenanceState, prePreempteState := "NONE", "NONE"
 	if !g.needsTerminationHandling {
 		return nil
 	}
@@ -159,10 +160,11 @@ func (g *gceTerminationSource) WatchState() <-chan NodeTerminationState {
 			glog.Errorf("Failed to get maintenance status for node %q - %v", g.state.NodeName, err)
 			return
 		}
-		if state == maintenanceEventTrue {
+		if state == maintenanceEventTrue && preMaintenanceState != state {
 			glog.Infof("Start handling Termination, %s is %s, node: %q", maintenanceEventSuffix, state, g.state.NodeName)
 			g.handleMaintenanceEvents(state, true)
 		}
+		preMaintenanceState = state
 	}, time.Second)
 	go wait.Forever(func() {
 		state, err := metadata.Get(preemptedEventSuffix)
@@ -170,10 +172,11 @@ func (g *gceTerminationSource) WatchState() <-chan NodeTerminationState {
 			glog.Errorf("Failed to get preemptible maintenance status for node %q - %v", g.state.NodeName, err)
 			return
 		}
-		if state == maintenanceEventTrue {
+		if state == maintenanceEventTrue && prePreempteState != state {
 			glog.Infof("Start handling Termination, %s is %s, node: %q", preemptedEventSuffix, state, g.state.NodeName)
 			g.handleMaintenanceEvents(state, true)
 		}
+		prePreempteState = state
 	}, time.Second)
 	return g.updateChannel
 }

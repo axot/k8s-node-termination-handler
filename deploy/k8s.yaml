@@ -49,7 +49,7 @@ spec:
       - image: k8s.gcr.io/gke-node-termination-handler@sha256:e08ca863a547754fa7b75064bdad04f04cbef86c7b0a181ecc7304e747623181
         name: node-termination-handler
         command: ["./node-termination-handler"]
-        args: ["--logtostderr", "--exclude-pods=$(POD_NAME):$(POD_NAMESPACE)", "-v=10"]
+        args: ["--logtostderr", "--exclude-pods=$(POD_NAME):$(POD_NAMESPACE)", "-v=10", "--system-pod-grace-period=5s"]
         securityContext:
           capabilities:
             # Necessary to reboot node
@@ -63,7 +63,7 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
-        resources: 
+        resources:
           limits:
             cpu: 150m
             memory: 30Mi
